@@ -1,15 +1,10 @@
-# 🚀 Welcome to your new awesome project!
+# Leaflet Map Center Marker Project
 
-This project has been created using **webpack-cli**, you can now run
+- Aim crosshair to desired location
+- Click to 'Noktayi Ekle' button
+- This will send a post request to the server with the latitude and longitude of the location
+- To download the points, click the 'Indir' button
+- To go mark a listed point on the map click 'İşaretle' button
+- To delete a point click the 'Sil' button
 
-```
-npm run build
-```
-
-or
-
-```
-yarn build
-```
-
-to bundle your application
+### Warning: App expects server to be running at localhost:3000
