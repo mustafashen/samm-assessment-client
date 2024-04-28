@@ -3,22 +3,25 @@ import L from "leaflet";
 import deletePoint from "./delete-point";
 
 // Gets points from the server
-export default function getPoints(map: Map) {
-  fetch("http://localhost:3000/points/read", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      addPointsToView(map, res.data);
-    })
-    .catch((err) => console.log(err));
+export default async function getPoints(map: Map) {
+  const pointList = document.querySelector("#error-message-container");
+  try {
+    const readRes = await fetch("http://localhost:3000/points/read", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const parsedRes = await readRes.json();
+    addPointsToView(map, parsedRes.data);
+    pointList.innerHTML = "";
+  } catch (error: unknown) {
+    pointList.innerHTML = "Noktaları getirme esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz.";
+  }
 }
 
 // Adds points to view
-export function addPointsToView(
+async function addPointsToView(
   map: Map,
   data: {
     id: string;
@@ -46,7 +49,7 @@ export function addPointsToView(
       const markButton = pointListItem.querySelector(".mark");
       markButton.addEventListener("click", () => {
         const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<p>Boylam: ${lat}<br/>Enlem: ${lng}</p>`).openPopup();
+        marker.bindPopup(`<p>Enlem: ${lat}<br/>Boylam: ${lng}</p>`).openPopup();
         map.setView([lat, lng], 15);
       });
 
@@ -68,9 +71,9 @@ function createPointListItem(point: {
   <li
     id="${id}" 
     class="points-list-item">
-    Boylam: ${lat}
+    Enlem: ${lat}
     <br/>
-    Enlem: ${lng}
+    Boylam: ${lng}
     <br/>
     Tarih: ${new Date(datetime).getDate() + "." + (new Date(datetime).getMonth() + 1) + "." + new Date(datetime).getFullYear() + " " + new Date(datetime).getHours() + ":" + new Date(datetime).getMinutes()}
     <br/>

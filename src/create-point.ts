@@ -2,7 +2,7 @@ import { Map } from "leaflet";
 import getPoints from "./get-points";
 
 // Save center coordinates
-export default function createPoint(map: Map) {
+export default async function createPoint(map: Map) {
   const centerCoordinates = map.getCenter();
   const now = new Date().toISOString();
 
@@ -11,24 +11,29 @@ export default function createPoint(map: Map) {
     lng: centerCoordinates.lng,
     datetime: now,
   };
-
-  fetch("http://localhost:3000/points/create", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      data: {
-        type: "points",
-        attributes: newPoint,
+  const pointList = document.querySelector("#error-message-container");
+  try {
+    const createRes = await fetch("http://localhost:3000/points/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    }),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.data) {
-        // Refresh points list
-        getPoints(map);
-      }
+      body: JSON.stringify({
+        data: {
+          type: "points",
+          attributes: newPoint,
+        },
+      }),
     });
+    const parsedRes = await createRes.json();
+
+    if (parsedRes.data) {
+      // Refresh points list
+      getPoints(map);
+    }
+    pointList.innerHTML = "";
+  } catch (error) {
+    pointList.innerHTML =
+      "Nokta yaratma esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz.";
+  }
 }
