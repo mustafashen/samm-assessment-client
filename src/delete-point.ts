@@ -7,20 +7,29 @@ export default async function deletePoint(
   id: string
 ) {
   target.addEventListener("click", async () => {
-    const pointList = document.querySelector("#error-message-container");
+    const errorMessageContainer = document.querySelector(
+      "#error-message-container"
+    );
     try {
       const deleteRes = await fetch(`http://localhost:3000/points/${id}`, {
         method: "DELETE",
       });
       const parsedRes = await deleteRes.json();
-
+      console.log(parsedRes)
       if (parsedRes.data) {
         getPoints(map);
+        errorMessageContainer.innerHTML = "";
+      } else if (parsedRes.errors) {
+        throw new Error("Nokta silme esnasında beklenmeyen bir hata oluştu. Hata: " + parsedRes.errors[0].detail);
+      } else {
+        throw new Error("Nokta silme esnasında beklenmeyen bir hata oluştu.");
       }
-      pointList.innerHTML = "";
     } catch (error: unknown) {
-      pointList.innerHTML =
-        "Nokta silme esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz.";
+      if (error instanceof Error) {
+        errorMessageContainer.innerHTML = error.message;
+      } else {
+        errorMessageContainer.innerHTML = "Nokta silme esnasinda beklenmeyen bir hata oluştu.";
+      }
     }
   });
 }

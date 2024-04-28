@@ -11,7 +11,9 @@ export default async function createPoint(map: Map) {
     lng: centerCoordinates.lng,
     datetime: now,
   };
-  const pointList = document.querySelector("#error-message-container");
+  const errorMessageContainer = document.querySelector(
+    "#error-message-container"
+  );
   try {
     const createRes = await fetch("http://localhost:3000/points/create", {
       method: "POST",
@@ -27,13 +29,21 @@ export default async function createPoint(map: Map) {
     });
     const parsedRes = await createRes.json();
 
+    console.log(parsedRes)
     if (parsedRes.data) {
       // Refresh points list
       getPoints(map);
+      errorMessageContainer.innerHTML = "";
+    } else if (parsedRes.errors) {
+      throw new Error("Nokta yaratma esnasinda beklenmeyen bir hata oluştu. Hata: " + parsedRes.errors[0].detail);
+    } else {
+      throw new Error("Nokta yaratma esnasinda beklenmeyen bir hata oluştu.")
     }
-    pointList.innerHTML = "";
   } catch (error) {
-    pointList.innerHTML =
-      "Nokta yaratma esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz.";
+    if (error instanceof Error) {
+      errorMessageContainer.innerHTML = error.message;
+    } else {
+      errorMessageContainer.innerHTML = "Nokta yaratma esnasinda beklenmeyen bir hata oluştu.";
+    }
   }
 }

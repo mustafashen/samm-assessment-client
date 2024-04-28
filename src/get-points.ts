@@ -4,7 +4,9 @@ import deletePoint from "./delete-point";
 
 // Gets points from the server
 export default async function getPoints(map: Map) {
-  const pointList = document.querySelector("#error-message-container");
+  const errorMessageContainer = document.querySelector(
+    "#error-message-container"
+  );
   try {
     const readRes = await fetch("http://localhost:3000/points/read", {
       method: "GET",
@@ -13,10 +15,25 @@ export default async function getPoints(map: Map) {
       },
     });
     const parsedRes = await readRes.json();
-    addPointsToView(map, parsedRes.data);
-    pointList.innerHTML = "";
+    if (parsedRes.data) {
+      addPointsToView(map, parsedRes.data);
+      errorMessageContainer.innerHTML = "";
+    } else if (parsedRes.errors) {
+      throw new Error(
+        "Noktaları getirirken hata oluştu. Hata: " + parsedRes.errors[0].detail
+      );
+    } else {
+      throw new Error(
+        "Noktaları getirme esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz."
+      );
+    }
   } catch (error: unknown) {
-    pointList.innerHTML = "Noktaları getirme esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz.";
+    if (error instanceof Error) {
+      errorMessageContainer.innerHTML = error.message;
+    } else {
+      errorMessageContainer.innerHTML =
+        "Noktaları getirme esnasında hata oluştu. Sunucu bağlantısını kontrol ediniz.";
+    }
   }
 }
 
