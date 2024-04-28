@@ -8,3 +8,17 @@
 - To delete a point click the 'Sil' button
 
 ### Warning: App expects server to be running at localhost:3000
+
+## Usage for Production
+
+- Clone the repo
+- Run `pnpm install`
+- Run `pnpm build:prod`
+- Run `pnpm serve`
+
+### Usage for Development
+
+- Clone the repo
+- Run `pnpm install`
+- Run `pnpm build:dev`
+- Run `pnpm serve`
